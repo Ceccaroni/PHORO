@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+/* ============================================
+   PHORO Design System – CSS Custom Properties
+   ============================================ */
+
+:root {
+  /* Primary colors */
+  --phoro-warmbeige: #F5F0E6;
+  --phoro-sidebar: #EDE8DA;
+  --phoro-primary: #1A3550;
+  --phoro-text: #3D405B;
+  --phoro-divider: #D4CFC3;
+
+  /* Accent colors */
+  --phoro-cta: #E07A5F;
+  --phoro-accent: #3A7CA5;
+  --phoro-progress: #6B9080;
+  --phoro-gold: #C9A227;
+
+  /* Tier colors */
+  --tier-dawn: #E07A5F;
+  --tier-light: #1A3550;
+  --tier-beacon: #6B9080;
+  --tier-pharos: #C9A227;
+
+  /* Functional colors */
+  --phoro-success: #6B9080;
+  --phoro-error: #D94F4F;
+  --phoro-warning: #C9A227;
+}
+
+/* Tailwind v4 theme extension */
+@theme inline {
+  /* Colors */
+  --color-phoro-bg: var(--phoro-warmbeige);
+  --color-phoro-sidebar: var(--phoro-sidebar);
+  --color-phoro-primary: var(--phoro-primary);
+  --color-phoro-text: var(--phoro-text);
+  --color-phoro-cta: var(--phoro-cta);
+  --color-phoro-accent: var(--phoro-accent);
+  --color-phoro-progress: var(--phoro-progress);
+  --color-phoro-gold: var(--phoro-gold);
+  --color-phoro-divider: var(--phoro-divider);
+  --color-phoro-success: var(--phoro-success);
+  --color-phoro-error: var(--phoro-error);
+  --color-phoro-warning: var(--phoro-warning);
+
+  --color-tier-dawn: var(--tier-dawn);
+  --color-tier-light: var(--tier-light);
+  --color-tier-beacon: var(--tier-beacon);
+  --color-tier-pharos: var(--tier-pharos);
+
+  /* Font family */
+  --font-lexend: "Lexend", system-ui, -apple-system, sans-serif;
+}
+
+/* Typography base */
+body {
+  font-family: var(--font-lexend);
+  background-color: var(--phoro-warmbeige);
+  color: var(--phoro-text);
+  line-height: 1.6;
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--phoro-divider);
+  border-radius: 3px;
+}
+
+/* Firefox scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--phoro-divider) transparent;
+}
