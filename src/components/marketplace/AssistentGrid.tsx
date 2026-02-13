@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import type { Assistant, Tier } from "@/types/database";
 import { AssistentCard } from "./AssistentCard";
 
@@ -11,11 +12,26 @@ interface AssistentGridProps {
 
 export function AssistentGrid({ assistants, userTier }: AssistentGridProps) {
   const router = useRouter();
+  const [loading, setLoading] = useState<string | null>(null);
 
-  function handleClick(assistant: Assistant) {
-    // Phase 3: create chat and redirect
-    // For now just log
-    console.log("Start chat with:", assistant.slug);
+  async function handleClick(assistant: Assistant) {
+    if (loading) return;
+    setLoading(assistant.id);
+
+    try {
+      const res = await fetch("/api/chats", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ assistantId: assistant.id }),
+      });
+
+      if (!res.ok) throw new Error("Failed to create chat");
+
+      const { chatId } = await res.json();
+      router.push(`/chat/${chatId}`);
+    } catch {
+      setLoading(null);
+    }
   }
 
   if (assistants.length === 0) {
@@ -34,6 +50,7 @@ export function AssistentGrid({ assistants, userTier }: AssistentGridProps) {
           assistant={assistant}
           userTier={userTier}
           onClick={handleClick}
+          loading={loading === assistant.id}
         />
       ))}
     </div>

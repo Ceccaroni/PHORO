@@ -1,6 +1,6 @@
 "use client";
 
-import { Lock } from "lucide-react";
+import { Lock, Loader2 } from "lucide-react";
 import type { Assistant, Tier } from "@/types/database";
 import { TierBadge } from "@/components/shared/TierBadge";
 import { hasAccess, tierLabel } from "@/lib/utils/tier";
@@ -9,34 +9,44 @@ interface AssistentCardProps {
   assistant: Assistant;
   userTier: Tier;
   onClick: (assistant: Assistant) => void;
+  loading?: boolean;
 }
 
 export function AssistentCard({
   assistant,
   userTier,
   onClick,
+  loading,
 }: AssistentCardProps) {
   const locked = !hasAccess(userTier, assistant.min_tier);
 
   function handleClick() {
-    if (locked) return;
+    if (locked || loading) return;
     onClick(assistant);
   }
 
   return (
     <button
       onClick={handleClick}
-      disabled={locked}
+      disabled={locked || loading}
       className={`relative w-full rounded-2xl border border-phoro-divider bg-white p-5 text-left transition-all duration-200 ${
         locked
           ? "cursor-not-allowed opacity-45 grayscale"
-          : "hover:shadow-md hover:scale-[1.02]"
+          : loading
+            ? "opacity-70"
+            : "hover:shadow-md hover:scale-[1.02]"
       }`}
     >
       {locked && (
         <Lock
           size={16}
           className="absolute right-4 top-4 text-phoro-text/40"
+        />
+      )}
+      {loading && (
+        <Loader2
+          size={16}
+          className="absolute right-4 top-4 animate-spin text-phoro-accent"
         />
       )}
 
