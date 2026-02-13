@@ -2,52 +2,55 @@
 
 ## Letzte Session
 - **Datum:** 2026-02-14
-- **Phase:** 2 (Core App Shell) – ABGESCHLOSSEN
+- **Phase:** 3 (Assistenten-Engine) – IN ARBEIT
 - **Bearbeiter:** Claude Opus 4.6
 
 ## Was wurde erledigt
-### Phase 1 (Foundation)
+### Phase 1 (Foundation) – FERTIG
 - Next.js 16, Tailwind v4, Supabase Client, Auth, DB-Migrationen, Typen
 
-### Phase 2 (Core App Shell)
-- AppShell-Komponente: Drei-Spalten-Layout (240px | flex-1 | 240px)
-- Linke Sidebar: "Neuer Chat"-Button (CTA-Farbe), Chat-Historie gruppiert nach Datum (Heute/Gestern/Älter), aktiver Chat mit Akzent-Balken, leerer State
-- Rechte Sidebar: User-Avatar (Initialen), Name, TierBadge, Fokus-Tools (featured Assistenten), 3 Kategorie-Buttons (uppercase, tracking)
-- Mobile Header: Hamburger-Menü für beide Sidebars, PHORO-Logo
-- Responsive: Sidebars als Overlays auf Mobile/Tablet mit Backdrop
-- ChatEmptyState: "Hallo [Name]." + "Was steht heute im Fokus?"
-- ChatInput: Auto-resize Textarea, rounded-3xl, Send-Button rounded-2xl in Pharos-Blau, Enter=senden, Shift+Enter=Zeilenumbruch
-- AssistentCard: TierBadge, Name, Beschreibung, Lock-State (grayscale + opacity), Hover-Effekte
-- AssistentGrid: Responsives Grid (1/2/3 Spalten)
-- Marketplace-Seite: `/marketplace/[category]` mit Kategorie-Label und Grid
-- TierBadge-Komponente: Farbige Badges für alle 4 Tiers
-- Tier-Utils: `hasAccess()` und `tierLabel()` Hilfsfunktionen
-- App-Layout: Paralleles Laden von Profile, Chats, Featured Assistants
-- Build erfolgreich (`npm run build` ohne Fehler)
+### Phase 2 (Core App Shell) – FERTIG
+- AppShell, Sidebars, Marketplace, AssistentCard, ChatInput, responsive Layout
+
+### Phase 3 (Assistenten-Engine) – IN ARBEIT
+**Fertig:**
+- LLM-Router (`src/lib/llm/router.ts`): Provider-agnostisch via Vercel AI SDK, OpenAI + Anthropic
+- LLM-Typen (`src/lib/llm/types.ts`): LLMConfig, ChatMessageInput
+- Chat-API-Route (`/api/chat`): Auth, Tier-Check, Chat-Verlauf aus DB, Streaming via SSE, speichert User- und Assistenten-Nachrichten, Auto-Titel nach erstem Austausch
+- Chat-Erstellungs-API (`/api/chats`): Erstellt neuen Chat mit Tier-Prüfung
+- ActiveChat-Komponente: `useChat` Hook (Vercel AI SDK), Streaming-Anzeige, Scroll-to-bottom
+- ChatMessage-Komponente: User rechts (Pharos-Blau), Assistent links (weiss), Markdown-Rendering
+- Chat-Seite `/chat/[chatId]`: Lädt Chat + Messages aus DB, rendert ActiveChat
+- AssistentCard/Grid: Erstellen jetzt echte Chats via API und navigieren zu `/chat/[chatId]`
+
+**Noch offen:**
+- Seed-SQL mit Test-Assistent (z.B. Inklusions-Architekt)
+- Build-Verifikation nach allen Änderungen
+- Supabase muss eingerichtet werden für End-to-End-Test
 
 ## Nächster Schritt (PRÄZISE)
-**Phase 3 – Assistenten-Engine:** LLM-Router implementieren, Chat-API-Route, Chat-Streaming, ChatMessage-Komponente, Chat-Verlauf laden, Tier-Zugriffsprüfung, erster Test-Assistent als Seed Data.
-Details: `docs/BRIEFING.md` Abschnitt 10 (Phase 3)
+1. `supabase/seed.sql` erstellen mit mindestens einem Test-Assistenten
+2. `npm run build` verifizieren
+3. Supabase-Projekt erstellen (EU), `.env.local` setzen, Migrationen + Seed ausführen
+4. End-to-End testen: Registrieren → Login → Marketplace → Chat starten → Streaming
+
+**Dann Phase 4:** Auth, Tiers & Payments
+Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
 
 ## Bekannte Issues
-- Next.js 16 zeigt Deprecation-Warning für `middleware.ts` (neues `proxy` Konzept). Middleware funktioniert aber noch korrekt.
+- Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
 - Supabase noch nicht verbunden (`.env.local` muss eingerichtet werden)
-- Chat-Funktionalität noch nicht implementiert (Buttons loggen nur in Console) – kommt in Phase 3
 
 ## Geänderte Dateien in letzter Session
-- `src/app/(app)/layout.tsx` (überarbeitet – AppShell mit Daten)
-- `src/app/(app)/chat/page.tsx` (überarbeitet – ChatEmptyState)
-- `src/app/(app)/marketplace/[category]/page.tsx` (neu)
-- `src/components/layout/AppShell.tsx` (neu)
-- `src/components/layout/Sidebar.tsx` (neu)
-- `src/components/layout/RightPanel.tsx` (neu)
-- `src/components/layout/Header.tsx` (neu)
-- `src/components/chat/ChatEmptyState.tsx` (neu)
-- `src/components/chat/ChatInput.tsx` (neu)
-- `src/components/marketplace/AssistentCard.tsx` (neu)
-- `src/components/marketplace/AssistentGrid.tsx` (neu)
-- `src/components/shared/TierBadge.tsx` (neu)
-- `src/lib/utils/tier.ts` (neu)
+- `src/lib/llm/router.ts` (neu)
+- `src/lib/llm/types.ts` (neu)
+- `src/app/api/chat/route.ts` (neu)
+- `src/app/api/chats/route.ts` (neu)
+- `src/app/(app)/chat/[chatId]/page.tsx` (neu)
+- `src/components/chat/ActiveChat.tsx` (neu)
+- `src/components/chat/ChatMessage.tsx` (neu)
+- `src/components/marketplace/AssistentCard.tsx` (aktualisiert – loading state)
+- `src/components/marketplace/AssistentGrid.tsx` (aktualisiert – echte Chat-Erstellung)
 
 ---
 
@@ -60,5 +63,5 @@ Details: `docs/BRIEFING.md` Abschnitt 10 (Phase 3)
 ### Session 2 – 2026-02-14
 - Phase 1 (Foundation) komplett umgesetzt
 - Phase 2 (Core App Shell) komplett umgesetzt
-- Drei-Spalten-Layout, Sidebars, Marketplace, AssistentCard, ChatInput
-- Status: Phase 2 abgeschlossen → Bereit für Phase 3
+- Phase 3 (Assistenten-Engine) begonnen: LLM-Router, Chat-API, Streaming, ChatMessage
+- Status: Phase 3 in Arbeit → Seed-Daten + Build-Check ausstehend
