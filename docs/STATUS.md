@@ -22,19 +22,11 @@
 - Build erfolgreich (`npm run build` ohne Fehler)
 
 ## Nächster Schritt (PRÄZISE)
-**Supabase einrichten:**
-1. Supabase-Projekt erstellen (EU-Region Frankfurt)
-2. Umgebungsvariablen in `.env.local` setzen
-3. Die 3 SQL-Migrationen im Supabase Dashboard ausführen
-4. Test-User registrieren und Login testen
-
-**Dann Phase 2:** Core App Shell – Drei-Spalten-Layout, Sidebar, Marketplace
+**Phase 2 – Core App Shell:** Drei-Spalten-Layout, linke Sidebar (Chat-Historie), rechte Sidebar (User + Kategorien), Marketplace-Grid, AssistentCard-Komponente.
 Details: `docs/BRIEFING.md` Abschnitt 9 (Phase 2)
 
 ## Bekannte Issues
 - Next.js 16 zeigt Deprecation-Warning für `middleware.ts` (neues `proxy` Konzept). Middleware funktioniert aber noch korrekt.
-- Supabase noch nicht verbunden (`.env.local` muss eingerichtet werden)
-- DB-Migrationen müssen noch manuell im Supabase Dashboard ausgeführt werden
 
 ## Geänderte Dateien in letzter Session
 - `package.json` (neu)
