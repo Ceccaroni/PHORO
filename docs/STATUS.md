@@ -2,7 +2,7 @@
 
 ## Letzte Session
 - **Datum:** 2026-02-14
-- **Phase:** 5 (Admin-Backend) – CODE FERTIG, Migrationen 005+006 ausstehend
+- **Phase:** 5 (Admin-Backend) – CODE FERTIG, E2E verifiziert
 - **Bearbeiter:** Claude Opus 4.6
 
 ## Was wurde erledigt
@@ -28,8 +28,9 @@
 ### Supabase-Setup – FERTIG
 - Supabase-Projekt erstellt (Organisation: Phoro, EU-Region Frankfurt, Free Plan)
 - `.env.local` konfiguriert (Supabase URL, Anon Key, Service Role Key, OpenAI API Key)
-- Migrationen 001–004 erfolgreich im SQL Editor ausgeführt
+- Migrationen 001–006 erfolgreich im SQL Editor ausgeführt
 - Seed-Daten ausgeführt (45 Assistenten in DB, alle aktiv)
+- Admin-User gesetzt: adrian@phoro.ch (`is_admin = true`)
 
 ### End-to-End-Test – BESTANDEN
 - Registrierung: FUNKTIONIERT (Account erstellt, Bestätigungs-E-Mail erhalten und bestätigt)
@@ -40,7 +41,7 @@
 - Chat-Streaming: FUNKTIONIERT (Nachrichten senden, Streaming-Antwort empfangen, Markdown-Rendering)
 - Chat-Historie: FUNKTIONIERT (Chats in linker Sidebar, Wechsel zwischen Chats)
 
-### Phase 4 (Auth, Profil & Sicherheit) – CODE FERTIG
+### Phase 4 (Auth, Profil & Sicherheit) – FERTIG
 - **Registrierung erweitert:** Optionale Felder Organisation + Rolle, werden in `raw_user_meta_data` gespeichert
 - **Passwort-Reset-Flow:** `/forgot-password` (E-Mail senden) + `/reset-password` (neues Passwort setzen via Auth-Callback)
 - **Logout:** Icon-Button in RightPanel, `signOut()` → Redirect auf `/login`
@@ -53,13 +54,10 @@
 - Build erfolgreich (`npm run build` ohne Fehler)
 
 ## Nächster Schritt (PRÄZISE)
-1. **Migration 005 ausführen:** SQL aus `supabase/migrations/005_update_handle_new_user.sql` im Supabase SQL Editor ausführen
-2. **Migration 006 ausführen:** SQL aus `supabase/migrations/006_admin_backend.sql` im Supabase SQL Editor ausführen
-3. **Storage-Bucket erstellen:** Supabase Dashboard → Storage → New Bucket → Name: "knowledge" (private)
-4. **E-Mail-Templates einfügen:** HTML aus `docs/EMAIL_TEMPLATES.md` in Supabase Dashboard → Authentication → Email Templates
-5. **Admin-User setzen:** `UPDATE profiles SET is_admin = true WHERE email = 'deine@email.ch';` im SQL Editor
-6. **E2E-Test Phase 4+5:** Auth-Flow, Admin-Panel unter `/admin/dashboard`
-7. **Stripe-Integration (Phase 4b, separate Session):** Checkout, Webhooks, Abo-Verwaltung, Tier-Gating
+1. **Storage-Bucket "knowledge" erstellen:** Supabase Dashboard → Storage → New Bucket (private) + Policies
+2. **E-Mail-Templates einfügen:** HTML aus `docs/EMAIL_TEMPLATES.md` in Supabase Dashboard → Authentication → Email Templates
+3. **Phase 6 starten:** Öffentliche Blog-Seiten, Polish, Content Pages
+4. **Stripe-Integration (Phase 4b, separate Session):** Checkout, Webhooks, Abo-Verwaltung, Tier-Gating
 
 ### Phase 5 (Admin-Backend) – CODE FERTIG
 - **Admin-Layout:** Geschützter Bereich (`/admin/*`), nur für `is_admin = true` User
@@ -79,10 +77,10 @@
 - Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
 
 ## Offene Aufgaben
-- [ ] **Migration 005 ausführen:** `supabase/migrations/005_update_handle_new_user.sql` im SQL Editor ausführen
-- [ ] **Migration 006 ausführen:** `supabase/migrations/006_admin_backend.sql` im SQL Editor ausführen
-- [ ] **Storage-Bucket "knowledge" erstellen:** Supabase Dashboard → Storage → New Bucket (private)
-- [ ] **Admin-User setzen:** `UPDATE profiles SET is_admin = true WHERE email = '...';`
+- [x] ~~Migration 005 ausführen~~ (erledigt)
+- [x] ~~Migration 006 ausführen~~ (erledigt)
+- [x] ~~Admin-User setzen~~ (adrian@phoro.ch)
+- [ ] **Storage-Bucket "knowledge" erstellen:** Supabase Dashboard → Storage → New Bucket (private) + Policies
 - [ ] **E-Mail-Templates in Supabase einfügen:** 3 Templates aus `docs/EMAIL_TEMPLATES.md`
 - [ ] **Custom SMTP konfigurieren:** Eigener Absender (noreply@phoro.ch) statt Supabase default
 - [ ] **Alten Chat aufräumen:** Erster Chat (`ce5dc3fc...`) hat leere Messages wegen AI SDK v6 Bug (vor Fix) – kann manuell gelöscht werden
