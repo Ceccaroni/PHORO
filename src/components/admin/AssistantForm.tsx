@@ -8,6 +8,7 @@ import { ModelSelect } from "./ModelSelect";
 import { TemperatureSlider } from "./TemperatureSlider";
 import { PromptEditor } from "./PromptEditor";
 import { IconPicker } from "./IconPicker";
+import { KnowledgeUploader } from "./KnowledgeUploader";
 import { AssistantPreview } from "./AssistantPreview";
 import type { Assistant, Category, Tier, Provider } from "@/types/database";
 
@@ -52,6 +53,14 @@ export function AssistantForm({ assistant, mode }: AssistantFormProps) {
     assistant?.system_prompt ?? ""
   );
 
+  // Knowledge base
+  const [knowledgeFiles, setKnowledgeFiles] = useState<string[]>(
+    assistant?.knowledge_files ?? []
+  );
+  const [knowledgeDescription, setKnowledgeDescription] = useState(
+    assistant?.knowledge_description ?? ""
+  );
+
   const handleSlugChange = useCallback((s: string) => setSlug(s), []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -75,6 +84,8 @@ export function AssistantForm({ assistant, mode }: AssistantFormProps) {
       temperature,
       max_tokens: maxTokens,
       system_prompt: systemPrompt,
+      knowledge_files: knowledgeFiles.length > 0 ? knowledgeFiles : null,
+      knowledge_description: knowledgeDescription || null,
     };
 
     try {
@@ -269,24 +280,29 @@ export function AssistantForm({ assistant, mode }: AssistantFormProps) {
         </div>
       </section>
 
-      {/* Section 4: Knowledge Base (placeholder) */}
+      {/* Section 4: Knowledge Base */}
       <section className="rounded-2xl border border-phoro-divider bg-white p-6">
         <h2 className="text-lg font-semibold text-phoro-primary">
           Knowledge Base
         </h2>
-        <p className="mt-2 text-sm text-phoro-text/50">
-          Datei-Upload wird verfügbar, sobald der Storage-Bucket
-          &quot;knowledge&quot; im Supabase Dashboard erstellt wurde.
-        </p>
-        <div>
-          <label className="mt-3 block text-sm font-medium text-phoro-text">
-            Beschreibung der Wissensbasis
-          </label>
-          <textarea
-            rows={2}
-            className="mt-1 block w-full rounded-lg border border-phoro-divider bg-phoro-bg px-3 py-2 text-sm text-phoro-text focus:border-phoro-accent focus:outline-none focus:ring-1 focus:ring-phoro-accent"
-            placeholder="Was enthält die Wissensbasis dieses Assistenten?"
+        <div className="mt-4 space-y-4">
+          <KnowledgeUploader
+            slug={slug}
+            files={knowledgeFiles}
+            onChange={setKnowledgeFiles}
           />
+          <div>
+            <label className="block text-sm font-medium text-phoro-text">
+              Beschreibung der Wissensbasis
+            </label>
+            <textarea
+              value={knowledgeDescription}
+              onChange={(e) => setKnowledgeDescription(e.target.value)}
+              rows={2}
+              className="mt-1 block w-full rounded-lg border border-phoro-divider bg-phoro-bg px-3 py-2 text-sm text-phoro-text focus:border-phoro-accent focus:outline-none focus:ring-1 focus:ring-phoro-accent"
+              placeholder="Was enthält die Wissensbasis dieses Assistenten?"
+            />
+          </div>
         </div>
       </section>
 

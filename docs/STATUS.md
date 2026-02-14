@@ -2,7 +2,7 @@
 
 ## Letzte Session
 - **Datum:** 2026-02-14
-- **Phase:** 4 (Auth, Profil & Sicherheit) – CODE FERTIG, Migration 005 ausstehend
+- **Phase:** 5 (Admin-Backend) – CODE FERTIG, Migrationen 005+006 ausstehend
 - **Bearbeiter:** Claude Opus 4.6
 
 ## Was wurde erledigt
@@ -54,16 +54,35 @@
 
 ## Nächster Schritt (PRÄZISE)
 1. **Migration 005 ausführen:** SQL aus `supabase/migrations/005_update_handle_new_user.sql` im Supabase SQL Editor ausführen
-2. **E-Mail-Templates einfügen:** HTML aus `docs/EMAIL_TEMPLATES.md` in Supabase Dashboard → Authentication → Email Templates
-3. **E2E-Test Phase 4:** Registrierung mit Org-Feldern, Passwort-Reset, Profil-Drawer, Logout, 2FA
-4. **Phase 5 starten:** Admin-Backend (Gründer-Panel für Assistenten-Verwaltung)
-5. **Stripe-Integration (separate Session):** Checkout, Webhooks, Abo-Verwaltung, Tier-Gating
+2. **Migration 006 ausführen:** SQL aus `supabase/migrations/006_admin_backend.sql` im Supabase SQL Editor ausführen
+3. **Storage-Bucket erstellen:** Supabase Dashboard → Storage → New Bucket → Name: "knowledge" (private)
+4. **E-Mail-Templates einfügen:** HTML aus `docs/EMAIL_TEMPLATES.md` in Supabase Dashboard → Authentication → Email Templates
+5. **Admin-User setzen:** `UPDATE profiles SET is_admin = true WHERE email = 'deine@email.ch';` im SQL Editor
+6. **E2E-Test Phase 4+5:** Auth-Flow, Admin-Panel unter `/admin/dashboard`
+7. **Stripe-Integration (Phase 4b, separate Session):** Checkout, Webhooks, Abo-Verwaltung, Tier-Gating
+
+### Phase 5 (Admin-Backend) – CODE FERTIG
+- **Admin-Layout:** Geschützter Bereich (`/admin/*`), nur für `is_admin = true` User
+- **AdminShell:** Responsive Sidebar mit Navigation (Dashboard, Assistenten, Benutzer, Blog, Zurück zur App)
+- **Dashboard:** Statistik-Karten (User gesamt, Chats gesamt, Chats heute, Assistenten), Benutzer nach Tier, Top-5-Assistenten
+- **Assistenten-Verwaltung:** Tabelle mit Filter (Kategorie, Tier, Status) und Sortierung, Erstellen und Bearbeiten mit vollständigem Formular
+- **AssistantForm (5 Sektionen):** Grunddaten (Name, Slug, Beschreibung, Kategorie, Tier, Icon, Sortierung, Aktiv/Featured), LLM-Config (Provider, Modell, Temperatur-Slider, Max Tokens), Systemprompt-Editor mit Vorlage, Knowledge-Base-Upload (Drag & Drop), Live-Vorschau der Marketplace-Kachel
+- **User-Verwaltung:** Tabelle aller User mit Tier-Dropdown zum manuellen Ändern
+- **Blog-Verwaltung:** CRUD mit Markdown-Editor, Vorschau, Slug-Generierung, Veröffentlichungs-Toggle
+- **API-Routes:** CRUD für Assistenten (`/api/admin/assistants`), Blog (`/api/admin/blog`), User-Tier (`/api/admin/users/[id]`)
+- **Admin-Auth-Utility:** `requireAdmin()` + `isErrorResponse()` Guards
+- **Migration 006:** `blog_posts`-Tabelle, Admin-RLS-Policies, Storage-Bucket-Anleitung
+- **BlogPost-Type:** In `src/types/database.ts` hinzugefügt
+- Build erfolgreich (`npm run build` ohne Fehler)
 
 ## Bekannte Issues
 - Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
 
 ## Offene Aufgaben
 - [ ] **Migration 005 ausführen:** `supabase/migrations/005_update_handle_new_user.sql` im SQL Editor ausführen
+- [ ] **Migration 006 ausführen:** `supabase/migrations/006_admin_backend.sql` im SQL Editor ausführen
+- [ ] **Storage-Bucket "knowledge" erstellen:** Supabase Dashboard → Storage → New Bucket (private)
+- [ ] **Admin-User setzen:** `UPDATE profiles SET is_admin = true WHERE email = '...';`
 - [ ] **E-Mail-Templates in Supabase einfügen:** 3 Templates aus `docs/EMAIL_TEMPLATES.md`
 - [ ] **Custom SMTP konfigurieren:** Eigener Absender (noreply@phoro.ch) statt Supabase default
 - [ ] **Alten Chat aufräumen:** Erster Chat (`ce5dc3fc...`) hat leere Messages wegen AI SDK v6 Bug (vor Fix) – kann manuell gelöscht werden
@@ -72,6 +91,40 @@
 - [ ] **Animiertes Favicon beim Streaming (Phase 6):** Sun-O-Symbol pulsiert/animiert im Browser-Tab während LLM-Streaming als "Denk-Indikator"
 
 ## Geänderte Dateien
+
+### Session 6 – 2026-02-14 (Phase 5: Admin-Backend)
+- `src/app/admin/layout.tsx` (neu – Admin-Layout mit Auth-Guard)
+- `src/app/admin/dashboard/page.tsx` (neu – Dashboard mit Statistiken)
+- `src/app/admin/assistenten/page.tsx` (neu – Assistenten-Übersicht)
+- `src/app/admin/assistenten/new/page.tsx` (neu – Neuer Assistent)
+- `src/app/admin/assistenten/[id]/page.tsx` (neu – Assistent bearbeiten)
+- `src/app/admin/users/page.tsx` (neu – User-Verwaltung)
+- `src/app/admin/blog/page.tsx` (neu – Blog-Übersicht)
+- `src/app/admin/blog/new/page.tsx` (neu – Neuer Blog-Beitrag)
+- `src/app/admin/blog/[id]/page.tsx` (neu – Blog-Beitrag bearbeiten)
+- `src/app/api/admin/assistants/route.ts` (neu – GET/POST Assistenten)
+- `src/app/api/admin/assistants/[id]/route.ts` (neu – PATCH/DELETE Assistent)
+- `src/app/api/admin/blog/route.ts` (neu – GET/POST Blog)
+- `src/app/api/admin/blog/[id]/route.ts` (neu – PATCH/DELETE Blog-Beitrag)
+- `src/app/api/admin/users/[id]/route.ts` (neu – PATCH User-Tier)
+- `src/components/admin/AdminShell.tsx` (neu – Admin-Layout-Shell)
+- `src/components/admin/AdminNav.tsx` (neu – Admin-Navigation)
+- `src/components/admin/AssistantForm.tsx` (neu – Vollständiges Assistenten-Formular)
+- `src/components/admin/AssistantsTable.tsx` (neu – Tabelle mit Filter/Sort)
+- `src/components/admin/AssistantPreview.tsx` (neu – Live-Vorschau Marketplace-Kachel)
+- `src/components/admin/BlogPostForm.tsx` (neu – Blog-Editor mit Markdown-Vorschau)
+- `src/components/admin/IconPicker.tsx` (neu – Lucide-Icon-Auswahl)
+- `src/components/admin/ModelSelect.tsx` (neu – Provider/Modell-Auswahl)
+- `src/components/admin/PromptEditor.tsx` (neu – Systemprompt-Editor mit Vorlage)
+- `src/components/admin/SlugInput.tsx` (neu – Auto-Slug-Generierung)
+- `src/components/admin/StatusBadge.tsx` (neu – Aktiv/Inaktiv-Badge)
+- `src/components/admin/TemperatureSlider.tsx` (neu – Temperatur-Slider)
+- `src/components/admin/KnowledgeUploader.tsx` (neu – Knowledge-Base-Datei-Upload)
+- `src/components/admin/UsersTable.tsx` (neu – User-Tabelle mit Tier-Änderung)
+- `src/lib/admin/auth.ts` (neu – requireAdmin() Guard)
+- `src/types/database.ts` (erweitert – BlogPost-Type)
+- `supabase/migrations/006_admin_backend.sql` (neu – Blog-Tabelle, Admin-RLS, Storage)
+- `package.json` (react-markdown + remark-gfm hinzugefügt)
 
 ### Session 5 – 2026-02-14 (Phase 4: Auth, Profil & Sicherheit)
 - `supabase/migrations/005_update_handle_new_user.sql` (neu – Trigger für Org-Felder aus Signup-Metadata)
@@ -123,6 +176,15 @@
 - `.env.local` konfiguriert (Supabase Keys + OpenAI API Key)
 - End-to-End-Test: Registrierung + E-Mail-Bestätigung funktionieren
 - E-Mail-Branding als offene Aufgabe in BRIEFING.md Phase 4 eingetragen
+
+### Session 6 – 2026-02-14
+- Phase 5 (Admin-Backend) komplett umgesetzt
+- Admin-Dashboard, Assistenten-CRUD, User-Verwaltung, Blog-CRUD
+- Knowledge-Upload-Komponente (Drag & Drop, Supabase Storage)
+- Build-Fehler behoben (react-markdown + remark-gfm installiert)
+- Fehlende Blog-Bearbeitungsseite erstellt
+- Migration 006 für Blog-Tabelle und Admin-RLS
+- Status: Phase 1–5 Code fertig → Migrationen 005+006 ausführen, dann E2E-Test
 
 ### Session 4 – 2026-02-14
 - Root-Redirect implementiert (`/` → `/login` oder `/chat`)
