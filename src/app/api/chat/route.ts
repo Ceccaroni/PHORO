@@ -102,7 +102,7 @@ export async function POST(request: Request) {
   );
 
   // 8. Return streaming response and save after completion
-  const response = result.toDataStreamResponse();
+  const response = result.toUIMessageStreamResponse();
 
   result.text.then(async (fullText) => {
     // Save assistant message

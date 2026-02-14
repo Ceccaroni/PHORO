@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import { useChat } from "ai/react";
+import { useRef, useEffect, useMemo } from "react";
+import { useChat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
 import type { ChatMessage as ChatMessageType } from "@/types/database";
@@ -21,15 +22,26 @@ export function ActiveChat({
 }: ActiveChatProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const { messages, input, setInput, append, isLoading } = useChat({
-    api: "/api/chat",
-    body: { chatId, assistantId },
-    initialMessages: initialMessages.map((m) => ({
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        body: { chatId, assistantId },
+      }),
+    [chatId, assistantId]
+  );
+
+  const { messages, sendMessage, status } = useChat({
+    transport,
+    messages: initialMessages.map((m) => ({
       id: m.id,
       role: m.role as "user" | "assistant",
       content: m.content,
+      parts: [{ type: "text" as const, text: m.content }],
     })),
   });
+
+  const isLoading = status === "streaming" || status === "submitted";
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -39,7 +51,7 @@ export function ActiveChat({
   }, [messages]);
 
   function handleSend(message: string) {
-    append({ role: "user", content: message });
+    sendMessage({ text: message });
   }
 
   return (
@@ -55,7 +67,19 @@ export function ActiveChat({
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-6 py-4">
         <div className="mx-auto max-w-3xl space-y-4">
           {messages.map((m) => (
-            <ChatMessage key={m.id} role={m.role} content={m.content} />
+            <ChatMessage
+              key={m.id}
+              role={m.role}
+              content={
+                m.parts
+                  ?.filter(
+                    (p): p is { type: "text"; text: string } =>
+                      p.type === "text"
+                  )
+                  .map((p) => p.text)
+                  .join("") ?? m.content
+              }
+            />
           ))}
         </div>
       </div>
