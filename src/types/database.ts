@@ -57,3 +57,16 @@ export interface ChatMessage {
   token_count: number | null;
   created_at: string;
 }
+
+export interface BlogPost {
+  id: string;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string | null;
+  is_published: boolean;
+  published_at: string | null;
+  author_id: string;
+  created_at: string;
+  updated_at: string;
+}
