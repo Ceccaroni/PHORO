@@ -2,7 +2,7 @@
 
 ## Letzte Session
 - **Datum:** 2026-02-14
-- **Phase:** 3 (Assistenten-Engine) – FERTIG inkl. Supabase-Setup
+- **Phase:** 3 (Assistenten-Engine) – FERTIG, End-to-End-Test teilweise bestanden
 - **Bearbeiter:** Claude Opus 4.6
 
 ## Was wurde erledigt
@@ -30,29 +30,40 @@
 - `.env.local` konfiguriert (Supabase URL, Anon Key, Service Role Key, OpenAI API Key)
 - Migrationen 001–003 erfolgreich im SQL Editor ausgeführt (profiles, assistants, chats + chat_messages)
 - Seed-Daten ausgeführt (45 Assistenten in DB)
-- Dev-Server läuft (`npm run dev` auf localhost:3000)
-- End-to-End-Test: läuft (Registrierung + Chat-Test durch Gründer)
+
+### End-to-End-Test (Session 3)
+- Registrierung: FUNKTIONIERT (Account erstellt, Bestätigungs-E-Mail erhalten und bestätigt)
+- Nach Bestätigung: Redirect auf Root-Seite (`/`) – dort nur Platzhalter (PHORO + Slogan)
+- E-Mail-Branding: Kommt als generische "Supabase Auth" Mail → als offene Aufgabe für Phase 4 notiert
+- Marketplace + Chat-Streaming: Noch nicht getestet (User muss `/register` bzw. `/login` direkt aufrufen)
 
 ## Nächster Schritt (PRÄZISE)
-**End-to-End-Test abschliessen:**
-1. Registrieren auf http://localhost:3000/register
-2. Bestätigungs-E-Mail anklicken (kommt von Supabase)
-3. Einloggen → Marketplace öffnen
-4. Inklusions-Architekt anklicken → Chat starten → Nachricht senden
-5. Streaming-Antwort verifizieren
+**End-to-End-Test fortsetzen:**
+1. http://localhost:3000/login aufrufen → mit registriertem Account einloggen
+2. Nach Login: App sollte zu `/chat` weiterleiten (AppShell mit 3-Spalten-Layout)
+3. Im Marketplace den Inklusions-Architekt anklicken → Chat starten
+4. Nachricht senden → Streaming-Antwort verifizieren
+
+**Root-Seite verbessern (Quick Fix):**
+- `/` sollte auf `/login` oder `/chat` weiterleiten statt Platzhalter anzuzeigen
 
 **Danach Phase 4 starten:** Auth, Tiers & Payments
 - Stripe-Integration (Checkout, Webhooks, Abo-Verwaltung)
 - 2FA (TOTP via Supabase Auth)
 - Profil-Seite (Tier anzeigen, Abo verwalten)
 - Tier-Gating durchsetzen (Middleware + API)
+- E-Mail-Branding (eigener Absender, PHORO-Template)
 - Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
 
 ## Bekannte Issues
 - Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
+- Root-Seite (`/`) zeigt nur Platzhalter – sollte weiterleiten auf `/login` oder `/chat`
+- E-Mail-Bestätigung leitet auf `/` statt `/login` weiter
 
 ## Offene Aufgaben
 - [ ] **E-Mail-Branding (Phase 4):** Bestätigungs-E-Mails (Registration, Passwort-Reset) mit PHORO-Branding senden – eigener Absender, eigenes Template, Logo, deutscher Text. Kein Supabase-Default.
+- [ ] **Root-Redirect:** `/` auf `/login` (nicht eingeloggt) bzw. `/chat` (eingeloggt) weiterleiten
+- [ ] **E-Mail-Bestätigungs-Redirect:** Nach Bestätigung auf `/login` statt `/` weiterleiten
 
 ## Geänderte Dateien in Session 2
 - `src/lib/llm/router.ts` (neu – LLM-Router mit Safety Block)
@@ -74,12 +85,13 @@
 - `src/lib/utils/tier.ts` (neu)
 - `src/app/(app)/layout.tsx` (überarbeitet – AppShell mit Daten)
 - `src/app/(app)/marketplace/[category]/page.tsx` (neu)
-- `docs/BRIEFING.md` (aktualisiert – Prompt-Sicherheitsregel)
+- `docs/BRIEFING.md` (aktualisiert – Prompt-Sicherheitsregel + E-Mail-Branding)
 - `supabase/seed.sql` (neu – 45 Assistenten)
 - `package.json` (aktualisiert – @ai-sdk/react)
 
 ### Session 3 – 2026-02-14
 - `.env.local` konfiguriert (Supabase + OpenAI)
+- `docs/BRIEFING.md` aktualisiert (E-Mail-Branding als Phase-4-Aufgabe)
 
 ---
 
@@ -101,5 +113,7 @@
 - Supabase-Projekt erstellt (Phoro Org, EU Frankfurt, Free Plan)
 - Migrationen 001–003 + Seed erfolgreich ausgeführt
 - `.env.local` konfiguriert (Supabase Keys + OpenAI API Key)
-- Dev-Server gestartet, End-to-End-Test läuft
-- Status: Phase 1–3 komplett → End-to-End-Test + Phase 4
+- Dev-Server gestartet
+- End-to-End-Test: Registrierung + E-Mail-Bestätigung funktionieren
+- E-Mail-Branding als offene Aufgabe in BRIEFING.md Phase 4 eingetragen
+- Status: Phase 1–3 komplett → Login + Marketplace + Chat-Test ausstehend, dann Phase 4
