@@ -12,7 +12,7 @@ Schweizer SaaS-Plattform für pädagogische KI-Assistenten. Dreispaltige Web-App
 - **Bekannte Issues:** Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
 
 ## Tech Stack
-Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (Auth + DB + Storage, EU-Region) · Vercel AI SDK · Stripe · Vercel Hosting
+Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (Auth + DB + Storage + MFA/TOTP, EU-Region) · Vercel AI SDK v4 (`@ai-sdk/react`) · Stripe (noch nicht integriert) · Vercel Hosting
 
 ## Die 5 wichtigsten Regeln
 1. **Farben & Font:** Alles über CSS Custom Properties in `globals.css`. Font: Lexend (dyslexie-optimiert). Siehe `docs/BRIEFING.md` Abschnitt 6.
@@ -33,6 +33,7 @@ Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (A
 | `docs/BRIEFING.md` | **Vollständiges Briefing** – alle Phasen, alle Details, Design-System, DB-Schema |
 | `docs/STATUS.md` | **Aktueller Stand** – was ist fertig, was kommt als nächstes, offene Bugs |
 | `docs/DECISIONS.md` | **Architektur-Entscheidungslog** – warum was wie entschieden wurde |
+| `docs/EMAIL_TEMPLATES.md` | **E-Mail-Templates** – PHORO-gebrandete HTML für Supabase Auth E-Mails |
 | `docs/phases/PHASE-X-COMPLETE.md` | **Abschluss-Doku** pro Phase |
 
 ## Phasenplan (Übersicht)

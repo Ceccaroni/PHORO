@@ -1,7 +1,7 @@
 # PHORO – Master-Briefing für Claude Code
 
-**Version:** 1.0
-**Datum:** 13. Februar 2026
+**Version:** 1.1
+**Datum:** 14. Februar 2026 (aktualisiert)
 **Autor:** Erstellt durch Claude Opus (Briefing-Architekt) im Auftrag des PHORO-Gründers
 **Zweck:** Dieses Dokument ist die einzige Wahrheitsquelle (Single Source of Truth) für den gesamten Aufbau der PHORO-Webapplikation. Claude Code liest dieses Dokument zu Beginn jeder Session.
 
@@ -165,7 +165,7 @@ Ein separater, geschützter Bereich (`/admin`), über den der Gründer:
 
 | Komponente | Technologie | Warum |
 |------------|-------------|-------|
-| **Framework** | Next.js 14+ (App Router) | React-basiert, Server Components, API Routes integriert, exzellentes Deployment |
+| **Framework** | Next.js 16 (App Router) | React-basiert, Server Components, API Routes integriert, exzellentes Deployment |
 | **Sprache** | TypeScript (strict mode) | Typsicherheit, bessere DX, weniger Bugs |
 | **Styling** | Tailwind CSS | Schnell, konsistent, perfekt für Design-System-Token |
 | **UI-Komponenten** | shadcn/ui (selektiv) | Zugänglich, unstyled Basis, passt zu Tailwind |
@@ -180,45 +180,61 @@ Ein separater, geschützter Bereich (`/admin`), über den der Gründer:
 | **E-Mail** | Resend oder Supabase SMTP | Für Bestätigungen, Passwort-Reset |
 | **Analytics** | Plausible oder PostHog (EU-hosted) | Datenschutzkonform, kein Google Analytics |
 
-### Wichtige npm-Pakete
+### Wichtige npm-Pakete (tatsächlich installiert)
 
 ```json
 {
   "dependencies": {
-    "next": "^14.x",
-    "react": "^18.x",
+    "next": "^16.x",
+    "react": "^19.x",
     "typescript": "^5.x",
     "@supabase/supabase-js": "^2.x",
     "@supabase/ssr": "^0.x",
-    "ai": "^3.x",
+    "ai": "^4.x",
+    "@ai-sdk/react": "^1.x",
+    "@ai-sdk/openai": "^1.x",
+    "@ai-sdk/anthropic": "^1.x",
     "openai": "^4.x",
-    "@anthropic-ai/sdk": "^0.x",
-    "stripe": "^14.x",
-    "@stripe/stripe-js": "^2.x",
-    "tailwindcss": "^3.x",
+    "tailwindcss": "^4.x",
     "lucide-react": "latest",
-    "zustand": "^4.x",
-    "zod": "^3.x",
-    "date-fns": "^3.x"
+    "react-markdown": "latest",
+    "remark-gfm": "latest"
   }
 }
 ```
 
-### Hinweis zu Vercel AI SDK (`ai` Paket)
+**Hinweis:** Vercel AI SDK v4/v6 Breaking Changes beachten – `@ai-sdk/react` nutzt `DefaultChatTransport` + `sendMessage` statt `useChat` mit direktem API-Call. Messages haben `parts[]` statt `content`.
+```
 
-Das `ai`-Paket von Vercel bietet eine einheitliche Streaming-Schnittstelle für verschiedene LLM-Provider. Es abstrahiert OpenAI, Anthropic und andere hinter einer gemeinsamen API:
+### Hinweis zu Vercel AI SDK (v4/v6)
 
+Das `ai`-Paket von Vercel bietet eine einheitliche Streaming-Schnittstelle für verschiedene LLM-Provider. **Wichtig: AI SDK v4+ hat Breaking Changes gegenüber v3.**
+
+**Server-seitig (Route Handler):**
 ```typescript
 import { streamText } from 'ai';
 import { openai } from '@ai-sdk/openai';
 import { anthropic } from '@ai-sdk/anthropic';
 
-// Der LLM-Router nutzt das Vercel AI SDK
-const result = await streamText({
+const result = streamText({
   model: provider === 'openai' ? openai(modelId) : anthropic(modelId),
   system: systemPrompt,
   messages: chatMessages,
+  maxTokens: maxOutputTokens, // Heisst jetzt maxTokens, nicht maxOutputTokens
 });
+
+return result.toUIMessageStreamResponse(); // Nicht toDataStreamResponse()
+```
+
+**Client-seitig (React):**
+```typescript
+import { useChat, DefaultChatTransport } from '@ai-sdk/react';
+
+const transport = new DefaultChatTransport({ api: '/api/chat', body: { chatId, assistantId } });
+const { messages, sendMessage, isLoading } = useChat({ transport });
+
+// Messages haben parts[] statt content:
+// msg.parts?.filter(p => p.type === 'text').map(p => p.text).join('')
 ```
 
 Dies vereinfacht die LLM-agnostische Architektur erheblich.
@@ -235,6 +251,7 @@ phoro/
 │   ├── STATUS.md                ← Wird nach jeder Session aktualisiert
 │   ├── HANDOFF.md               ← Übergabe-Template zwischen Sessions
 │   ├── DECISIONS.md             ← Architektur-Entscheidungslog
+│   ├── EMAIL_TEMPLATES.md       ← PHORO-gebrandete E-Mail-Templates für Supabase
 │   └── phases/
 │       ├── PHASE-1-COMPLETE.md  ← Abschluss-Doku Phase 1
 │       ├── PHASE-2-COMPLETE.md  ← etc.
@@ -251,9 +268,10 @@ phoro/
 │   │   ├── layout.tsx           ← Root Layout (Font, Metadata)
 │   │   ├── page.tsx             ← Landing/Home oder Redirect
 │   │   ├── (auth)/
-│   │   │   ├── login/page.tsx
-│   │   │   ├── register/page.tsx
-│   │   │   └── verify/page.tsx
+│   │   │   ├── login/page.tsx          ← Login mit MFA/TOTP-Support
+│   │   │   ├── register/page.tsx       ← Registrierung mit optionalen Org-Feldern
+│   │   │   ├── forgot-password/page.tsx ← Passwort-Reset E-Mail senden
+│   │   │   └── reset-password/page.tsx  ← Neues Passwort setzen
 │   │   ├── (app)/               ← Geschützter App-Bereich
 │   │   │   ├── layout.tsx       ← App-Layout (Sidebar + Header + Rechte Sidebar)
 │   │   │   ├── chat/
@@ -283,6 +301,10 @@ phoro/
 │   │   │   └── impressum/page.tsx
 │   │   └── api/
 │   │       ├── chat/route.ts    ← Chat-Streaming-Endpoint
+│   │       ├── chats/route.ts   ← Chat erstellen
+│   │       ├── profile/
+│   │       │   ├── route.ts     ← PATCH: Profil-Felder updaten
+│   │       │   └── password/route.ts ← POST: Passwort ändern
 │   │       ├── assistenten/route.ts
 │   │       ├── webhooks/
 │   │       │   └── stripe/route.ts
@@ -292,9 +314,11 @@ phoro/
 │   │   ├── ui/                  ← Basis-UI-Komponenten (shadcn)
 │   │   ├── layout/
 │   │   │   ├── Sidebar.tsx      ← Linke Sidebar (Chat-Historie)
-│   │   │   ├── RightPanel.tsx   ← Rechte Sidebar (User + Kategorien)
+│   │   │   ├── RightPanel.tsx   ← Rechte Sidebar (User + Kategorien + Logout + Settings)
 │   │   │   ├── Header.tsx
 │   │   │   └── AppShell.tsx     ← Gesamtlayout der App
+│   │   ├── profile/
+│   │   │   └── ProfileDrawer.tsx ← Slide-in Drawer (Profil, Passwort, 2FA)
 │   │   ├── chat/
 │   │   │   ├── ChatMessage.tsx
 │   │   │   ├── ChatInput.tsx
@@ -341,8 +365,9 @@ phoro/
 │   │   ├── 001_users.sql
 │   │   ├── 002_assistants.sql
 │   │   ├── 003_chats.sql
-│   │   └── ...
-│   └── seed.sql                 ← Test-Daten
+│   │   ├── 004_fix_rls_recursion.sql  ← is_admin() SECURITY DEFINER
+│   │   └── 005_update_handle_new_user.sql ← Org-Felder aus Signup-Metadata
+│   └── seed.sql                 ← 45 Assistenten (alle aktiv)
 ├── .env.local.example           ← Template für Umgebungsvariablen
 ├── next.config.ts
 ├── tailwind.config.ts
@@ -468,10 +493,11 @@ body {
 ### Übersicht
 
 ```
-PHASE 1 – Foundation          ← Projekt-Setup, DB-Schema, Auth-Basis
-PHASE 2 – Core App Shell      ← Das Drei-Spalten-Layout, Navigation
-PHASE 3 – Assistenten-Engine  ← LLM-Router, Chat-Streaming, Kern-Funktionalität
-PHASE 4 – Auth, Tiers & Pay   ← Tier-Logik, Stripe, Registrierung
+PHASE 1 – Foundation          ← Projekt-Setup, DB-Schema, Auth-Basis       [FERTIG]
+PHASE 2 – Core App Shell      ← Drei-Spalten-Layout, Navigation            [FERTIG]
+PHASE 3 – Assistenten-Engine  ← LLM-Router, Chat-Streaming                 [FERTIG ✓ E2E]
+PHASE 4a – Auth, Profil & 2FA ← Passwort-Reset, Profil, 2FA, Logout       [CODE FERTIG]
+PHASE 4b – Stripe & Tiers     ← Checkout, Webhooks, Tier-Gating           [AUSSTEHEND]
 PHASE 5 – Admin-Backend       ← Gründer-Panel zum Verwalten der Assistenten
 PHASE 6 – Polish & Content    ← Blog, öffentliche Seiten, Feinschliff
 PHASE 7 – Marketing-Page      ← Landing Page (erst wenn App funktioniert)
@@ -845,39 +871,64 @@ Ein User kann einen Assistenten auswählen, eine Konversation starten, Nachricht
 
 ---
 
-## 11. PHASE 4 – Auth, Tiers & Payments
+## 11. PHASE 4 – Auth, Profil, Sicherheit & Payments
 
-### Ziel
-Vollständige Registrierung, Login, Tier-Verwaltung und Stripe-Integration.
+> **Phase 4 ist aufgeteilt in 4a (Auth/Profil/2FA) und 4b (Stripe).** Phase 4a ist code-fertig. Phase 4b wird in einer separaten Session gebaut.
 
-### Aufgaben
+### Phase 4a: Auth, Profil & Sicherheit [CODE FERTIG]
 
-1. **Registrierung**
-   - E-Mail + Passwort
-   - Pflichtfelder: E-Mail, Passwort, Anzeigename
-   - Optionale Felder: Organisation, Rolle
-   - E-Mail-Bestätigung (Supabase sendet Verification-Link)
-   - Nach Bestätigung: Redirect zur App (Dawn-Tier als Default)
+**Was wurde gebaut:**
 
-2. **Login**
-   - E-Mail + Passwort
-   - "Passwort vergessen" Flow
-   - 2-Faktor-Authentifizierung (TOTP) – optional aktivierbar in Profileinstellungen
-   - Persistente Session (Supabase handles via Cookies)
+1. **Registrierung erweitert** (`src/app/(auth)/register/page.tsx`)
+   - E-Mail + Passwort + Anzeigename (Pflicht)
+   - Optionale Felder: Organisation, Rolle (visuell abgetrennt mit "Optional"-Label)
+   - Werte werden in `raw_user_meta_data` übergeben und via Trigger in `profiles` geschrieben
+   - `emailRedirectTo` korrekt auf `/auth/callback` gesetzt
 
-3. **Profil-Seite** (in rechter Sidebar oder als Modal)
-   - Name ändern
-   - Passwort ändern
-   - 2FA aktivieren/deaktivieren
-   - Aktuelles Tier anzeigen
-   - Upgrade-Button (führt zu Stripe Checkout)
+2. **Passwort-Reset-Flow**
+   - `src/app/(auth)/forgot-password/page.tsx` – E-Mail eingeben, Reset-Link senden
+   - `src/app/(auth)/reset-password/page.tsx` – Neues Passwort setzen (User kommt authentifiziert via Auth-Callback)
+   - Login-Seite hat "Passwort vergessen?"-Link
+   - Middleware behandelt `/forgot-password` (öffentlich) und `/reset-password` (braucht Session)
 
-4. **Beacon/Pharos Registrierung**
-   - Zusätzliches Feld: Organisation auswählen (Dropdown oder Freitext)
-   - Beacon/Pharos-Accounts werden vom Gründer manuell freigeschaltet (vorerst)
-   - Später: Self-Service mit Stripe-Abo-Verwaltung
+3. **Login mit MFA** (`src/app/(auth)/login/page.tsx`)
+   - Zwei-Schritt-Login: Credentials → TOTP-Code (wenn 2FA aktiviert)
+   - Prüft `aal1` → `aal2` nach erfolgreichem Passwort-Login
+   - 6-stellige Code-Eingabe mit numerischer Tastatur
 
-5. **Stripe Integration**
+4. **Logout** (`src/components/layout/RightPanel.tsx`)
+   - LogOut-Icon-Button neben User-Info
+   - `supabase.auth.signOut()` → Redirect auf `/login`
+
+5. **Profil-API-Routes**
+   - `src/app/api/profile/route.ts` – PATCH: display_name, organization_name, organization_role
+   - `src/app/api/profile/password/route.ts` – POST: Passwort ändern (min. 8 Zeichen)
+
+6. **ProfileDrawer** (`src/components/profile/ProfileDrawer.tsx`)
+   - Slide-in Drawer von rechts, geöffnet via Settings-Icon in RightPanel
+   - 3 Tabs: Profil (Name, E-Mail read-only, Org, Rolle, Tier-Badge), Passwort (ändern), Sicherheit (2FA)
+   - 2FA: Aktivieren (QR-Code via `mfa.enroll()`, Code verifizieren), Deaktivieren (`mfa.unenroll()`)
+
+7. **E-Mail-Templates** (`docs/EMAIL_TEMPLATES.md`)
+   - 3 PHORO-gebrandete HTML-Templates: E-Mail-Bestätigung, Passwort-Reset, Magic Link
+   - PHORO Design-System (Warm-Beige, Pharos-Blau, Morgenrot-CTA)
+   - Deutscher Text, responsive, E-Mail-sichere Fonts
+   - Anleitung für Supabase Dashboard + Custom SMTP
+
+8. **DB-Migration** (`supabase/migrations/005_update_handle_new_user.sql`)
+   - Trigger `handle_new_user()` aktualisiert: propagiert `organization_name` + `organization_role` aus Signup-Metadata
+
+**User-Aktionen nach Code-Fertigstellung:**
+- [ ] Migration 005 im Supabase SQL Editor ausführen
+- [ ] E-Mail-Templates in Supabase Dashboard → Authentication → Email Templates einfügen
+- [ ] Optional: Custom SMTP konfigurieren (eigener Absender)
+- [ ] E2E-Test: Registrierung, Passwort-Reset, Profil-Drawer, Logout, 2FA
+
+### Phase 4b: Stripe & Tier-Gating [AUSSTEHEND – separate Session]
+
+**Noch zu bauen:**
+
+1. **Stripe Integration**
    - Stripe-Produkte und Preise anlegen:
      - PHORO Light Monatlich: 19 CHF
      - PHORO Light Jährlich: 190 CHF
@@ -886,29 +937,34 @@ Vollständige Registrierung, Login, Tier-Verwaltung und Stripe-Integration.
    - Stripe Webhook: Aktualisiert `tier` in `profiles`-Tabelle bei erfolgreicher Zahlung
    - Stripe Customer Portal: User kann Abo selbst verwalten (kündigen, Zahlungsmethode ändern)
 
-6. **Bezahlung: Stufenweiser Ansatz**
+2. **Bezahlung: Stufenweiser Ansatz**
    - **Sofort (MVP):** Stripe für Kreditkarten (Light-Tier)
    - **Bald danach:** SEPA-Lastschrift via Stripe (für DACH-Raum gängig)
-   - **Perspektivisch:** Twint (sobald Stripe Twint unterstützt ODER via separaten Twint-Payment-Provider). Für den MVP ist es OK, Twint noch nicht zu haben.
-   - **Beacon/Pharos:** Rechnung (manueller Prozess). Der Gründer stellt Rechnungen. Im Admin-Backend kann er Tiers manuell setzen. Schulen und Gemeinden zahlen in der Schweiz fast immer per Rechnung – das ist erwartbar und kein Problem.
+   - **Perspektivisch:** Twint (sobald Stripe Twint unterstützt ODER via separaten Twint-Payment-Provider)
+   - **Beacon/Pharos:** Rechnung (manueller Prozess). Gründer stellt Rechnungen, setzt Tiers manuell im Admin-Backend.
 
-7. **E-Mail-Branding**
-   - Bestätigungs-E-Mails (Registration, Passwort-Reset) müssen mit PHORO-Branding gesendet werden – eigener Absender (z.B. `noreply@phoro.ch`), eigenes HTML-Template, kein Supabase-Default
-   - Supabase Dashboard → Authentication → Email Templates anpassen
-   - Custom SMTP konfigurieren (eigene Domain)
-   - Design passend zum PHORO Design-System (Warm-Beige, Pharos-Blau, Logo)
-   - Deutscher Text, professionell, passend zur Zielgruppe (Lehrpersonen, Schulleitungen)
+3. **Profil-Upgrade**
+   - Upgrade-Button im ProfileDrawer (führt zu Stripe Checkout)
+   - Tier-Wechsel wirkt sich sofort auf Assistenten-Zugang aus
 
-### Definition of Done – Phase 4
-- [x] Registrierung mit E-Mail-Bestätigung funktioniert
-- [x] Login mit Passwort funktioniert
-- [x] 2FA kann aktiviert werden
-- [x] Profil-Seite mit Tier-Anzeige
-- [x] Stripe Checkout für Light-Tier funktioniert (Test-Mode)
-- [x] Webhook aktualisiert Tier in DB
-- [x] Tier-Wechsel wirkt sich sofort auf Assistenten-Zugang aus
-- [x] E-Mail-Templates gebrandet (PHORO-Absender, Logo, Design, deutscher Text)
-- [x] Git Commit: `feat: Phase 4 complete – Auth, Tiers & Payments`
+### Definition of Done – Phase 4a [CODE FERTIG]
+- [x] Registrierung mit optionalen Org-Feldern
+- [x] Passwort-Reset-Flow (forgot + reset)
+- [x] Login mit MFA/TOTP-Support
+- [x] Logout-Button
+- [x] Profil-API (Name, Org, Rolle, Passwort ändern)
+- [x] ProfileDrawer mit 3 Tabs (Profil, Passwort, 2FA)
+- [x] E-Mail-Templates im PHORO-Design
+- [x] DB-Migration für Org-Felder
+- [x] Build erfolgreich (`npm run build` ohne Fehler)
+- [x] Git Commit: `feat(phase-4): auth, profile & security`
+
+### Definition of Done – Phase 4b [AUSSTEHEND]
+- [ ] Stripe Checkout für Light-Tier (Test-Mode)
+- [ ] Webhook aktualisiert Tier in DB
+- [ ] Tier-Wechsel wirkt sich sofort auf Assistenten-Zugang aus
+- [ ] Upgrade-Button im Profil
+- [ ] Git Commit: `feat(phase-4b): stripe integration`
 
 ---
 
