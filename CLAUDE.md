@@ -6,9 +6,9 @@
 Schweizer SaaS-Plattform für pädagogische KI-Assistenten. Dreispaltige Web-App (Sidebar links: Chat-Historie | Mitte: Chat/Marketplace | Sidebar rechts: User + Kategorien). Spezialisierte Workflow-Assistenten für Lehrpersonen, Heilpädagog:innen und Schulleitungen in der Deutschschweiz.
 
 ## Aktueller Status
-- **Phase:** 3 (Assistenten-Engine) – CODE FERTIG, Supabase-Setup ausstehend
-- **Zuletzt abgeschlossen:** Phase 3 – LLM-Router, Chat-API, Streaming, ChatMessage, Seed-Daten (45 Assistenten)
-- **Nächster Schritt:** Supabase einrichten, Migrationen + Seed ausführen, End-to-End testen, dann Phase 4
+- **Phase:** 3 FERTIG, Phase 4 als nächstes
+- **Zuletzt abgeschlossen:** Phase 3 – E2E-Test bestanden (Auth → Marketplace → Chat-Streaming)
+- **Nächster Schritt:** Phase 4 starten (Auth, Tiers & Payments) – siehe `docs/BRIEFING.md` Abschnitt 11
 - **Bekannte Issues:** Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
 
 ## Tech Stack
@@ -39,7 +39,7 @@ Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (A
 ```
 Phase 1 – Foundation          ← Setup, DB, Auth-Basis          [FERTIG]
 Phase 2 – Core App Shell      ← 3-Spalten-Layout, Navigation   [FERTIG]
-Phase 3 – Assistenten-Engine  ← LLM-Router, Chat, Streaming    [CODE FERTIG]
+Phase 3 – Assistenten-Engine  ← LLM-Router, Chat, Streaming    [FERTIG ✓ E2E]
 Phase 4 – Auth, Tiers & Pay   ← Registrierung, Stripe          [NÄCHSTE]
 Phase 5 – Admin-Backend       ← Gründer-Panel für Assistenten
 Phase 6 – Polish & Content    ← Blog, öffentliche Seiten

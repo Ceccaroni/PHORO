@@ -17,9 +17,14 @@ export async function POST(request: Request) {
   }
 
   // useChat sends: { messages, ...body }
+  // AI SDK v6 uses "parts" instead of "content" for message text
   const body = await request.json();
   const { messages: clientMessages, chatId, assistantId } = body as {
-    messages: { role: string; content: string }[];
+    messages: {
+      role: string;
+      content?: string;
+      parts?: { type: string; text?: string }[];
+    }[];
     chatId: string;
     assistantId: string;
   };
@@ -29,9 +34,20 @@ export async function POST(request: Request) {
   }
 
   // Get the latest user message
-  const lastMessage = clientMessages[clientMessages.length - 1];
-  if (lastMessage.role !== "user") {
+  const lastMsg = clientMessages[clientMessages.length - 1];
+  if (lastMsg.role !== "user") {
     return new Response("Last message must be from user", { status: 400 });
+  }
+
+  // Extract text: AI SDK v6 uses parts[], fallback to content
+  const lastMessageContent =
+    lastMsg.parts
+      ?.filter((p) => p.type === "text")
+      .map((p) => p.text)
+      .join("") || lastMsg.content || "";
+
+  if (!lastMessageContent) {
+    return new Response("Empty message", { status: 400 });
   }
 
   // 2. Load assistant config
@@ -71,11 +87,15 @@ export async function POST(request: Request) {
   }
 
   // 5. Save user message to DB
-  await supabase.from("chat_messages").insert({
+  const { error: insertError } = await supabase.from("chat_messages").insert({
     chat_id: chatId,
     role: "user",
-    content: lastMessage.content,
+    content: lastMessageContent,
   });
+
+  if (insertError) {
+    return new Response("Failed to save message", { status: 500 });
+  }
 
   // 6. Build messages for LLM (from DB for full history)
   const { data: history } = await supabase
@@ -126,7 +146,7 @@ export async function POST(request: Request) {
 
     if (count === 2) {
       try {
-        const title = await generateChatTitle(lastMessage.content, fullText);
+        const title = await generateChatTitle(lastMessageContent, fullText);
         await supabase.from("chats").update({ title }).eq("id", chatId);
       } catch {
         // Title generation is non-critical

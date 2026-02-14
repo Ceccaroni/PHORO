@@ -47,6 +47,13 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Root page: redirect based on auth state
+  if (pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = user ? "/chat" : "/login";
+    return NextResponse.redirect(url);
+  }
+
   // Auth pages: redirect to app if already authenticated
   const isAuthRoute =
     pathname.startsWith("/login") || pathname.startsWith("/register");
