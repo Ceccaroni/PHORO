@@ -9,9 +9,24 @@ const lexend = Lexend({
 });
 
 export const metadata: Metadata = {
-  title: "PHORO – KI-Assistenten für Bildungsprofis",
+  metadataBase: new URL("https://phoro.ch"),
+  title: {
+    template: "%s | PHORO",
+    default: "PHORO – KI-Assistenten für Bildungsprofis",
+  },
   description:
     "Schweizer SaaS-Plattform mit spezialisierten KI-Assistenten für Lehrpersonen, Heilpädagog:innen und Schulleitungen.",
+  openGraph: {
+    type: "website",
+    locale: "de_CH",
+    siteName: "PHORO",
+    title: "PHORO – KI-Assistenten für Bildungsprofis",
+    description:
+      "Spezialisierte KI-Assistenten für Lehrpersonen, Heilpädagog:innen und Schulleitungen in der Deutschschweiz.",
+  },
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({

@@ -20,3 +20,14 @@ export function tierLabel(tier: Tier): string {
   };
   return labels[tier];
 }
+
+const TIER_COLORS: Record<Tier, string> = {
+  dawn: "#E07A5F",
+  light: "#1A3550",
+  beacon: "#6B9080",
+  pharos: "#C9A227",
+};
+
+export function tierColor(tier: Tier): string {
+  return TIER_COLORS[tier];
+}

@@ -6,9 +6,9 @@
 Schweizer SaaS-Plattform für pädagogische KI-Assistenten. Dreispaltige Web-App (Sidebar links: Chat-Historie | Mitte: Chat/Marketplace | Sidebar rechts: User + Kategorien). Spezialisierte Workflow-Assistenten für Lehrpersonen, Heilpädagog:innen und Schulleitungen in der Deutschschweiz.
 
 ## Aktueller Status
-- **Phase:** 5 FERTIG (Admin-Backend) – Migrationen 001–006 ausgeführt, Admin-User gesetzt
-- **Zuletzt abgeschlossen:** Phase 4+5 – Auth, Profil, 2FA, Admin-Dashboard, Assistenten-CRUD, User-Verwaltung, Blog-CRUD
-- **Nächster Schritt:** Phase 6 (Polish & Content) – öffentliche Blog-Seiten, Content Pages, Feinschliff
+- **Phase:** 6 FERTIG (Polish, Blog & Content Pages)
+- **Zuletzt abgeschlossen:** Phase 6 – Öffentliche Seiten, Blog, SEO, Loading States, Tier-Branding, Favicon, Accessibility
+- **Nächster Schritt:** Phase 7 (Marketing-Landingpage) oder Phase 4b (Stripe-Integration)
 - **Bekannte Issues:** Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
 
 ## Tech Stack
@@ -45,7 +45,7 @@ Phase 3 – Assistenten-Engine  ← LLM-Router, Chat, Streaming    [FERTIG ✓ E
 Phase 4 – Auth, Profil & 2FA  ← Passwort-Reset, Profil, 2FA    [FERTIG]
 Phase 4b – Stripe             ← Checkout, Webhooks, Tiers       [AUSSTEHEND]
 Phase 5 – Admin-Backend       ← Gründer-Panel für Assistenten   [CODE FERTIG]
-Phase 6 – Polish & Content    ← Blog, öffentliche Seiten
+Phase 6 – Polish & Content    ← Blog, öffentliche Seiten        [CODE FERTIG]
 Phase 7 – Marketing-Page      ← Landing Page (wenn App läuft)
 ```
 

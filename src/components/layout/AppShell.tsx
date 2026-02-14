@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Sidebar } from "./Sidebar";
 import { RightPanel } from "./RightPanel";
 import { Header } from "./Header";
+import { useFavicon } from "@/hooks/useFavicon";
+import { useStreamingStore } from "@/stores/streamingStore";
 import type { Profile, Assistant, Chat } from "@/types/database";
 
 interface AppShellProps {
@@ -21,6 +23,8 @@ export function AppShell({
 }: AppShellProps) {
   const [leftOpen, setLeftOpen] = useState(false);
   const [rightOpen, setRightOpen] = useState(false);
+  const isStreaming = useStreamingStore((s) => s.isStreaming);
+  useFavicon(profile.tier, isStreaming);
 
   return (
     <div className="flex h-screen flex-col overflow-hidden bg-phoro-bg">
@@ -34,6 +38,7 @@ export function AppShell({
         {/* Left sidebar */}
         <Sidebar
           chats={chats}
+          tier={profile.tier}
           open={leftOpen}
           onClose={() => setLeftOpen(false)}
         />

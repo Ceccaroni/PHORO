@@ -46,6 +46,7 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
           onKeyDown={handleKeyDown}
           disabled={disabled}
           placeholder="Nachricht schreiben..."
+          aria-label="Nachricht eingeben"
           rows={1}
           className="flex-1 resize-none bg-transparent text-lg text-phoro-text outline-none placeholder:text-phoro-text/40"
         />

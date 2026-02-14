@@ -6,8 +6,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { LogOut, Settings } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { ProfileDrawer } from "@/components/profile/ProfileDrawer";
-import type { Profile, Assistant, Category } from "@/types/database";
+import type { Profile, Assistant, Category, Tier } from "@/types/database";
 import { TierBadge } from "@/components/shared/TierBadge";
+import { tierColor } from "@/lib/utils/tier";
 
 interface RightPanelProps {
   profile: Profile;
@@ -22,7 +23,7 @@ const categories: { label: string; value: Category }[] = [
   { label: "Admin", value: "admin" },
 ];
 
-function UserInitials({ name }: { name: string }) {
+function UserInitials({ name, tier }: { name: string; tier: Tier }) {
   const initials = name
     .split(" ")
     .map((n) => n[0])
@@ -30,8 +31,13 @@ function UserInitials({ name }: { name: string }) {
     .toUpperCase()
     .slice(0, 2);
 
+  const color = tierColor(tier);
+
   return (
-    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-phoro-cta/15 text-sm font-bold text-phoro-cta">
+    <div
+      className="flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold"
+      style={{ backgroundColor: `${color}22`, color }}
+    >
       {initials}
     </div>
   );
@@ -65,6 +71,8 @@ export function RightPanel({
       )}
 
       <aside
+        role="complementary"
+        aria-label="Benutzer und Kategorien"
         className={`fixed right-0 top-0 z-50 flex h-full w-60 flex-col bg-phoro-sidebar transition-transform duration-200 xl:relative xl:z-0 xl:translate-x-0 ${
           open ? "translate-x-0" : "translate-x-full"
         }`}
@@ -72,7 +80,7 @@ export function RightPanel({
         {/* User info */}
         <div className="border-b border-phoro-divider p-4">
           <div className="flex items-center gap-3">
-            <UserInitials name={profile.display_name ?? profile.email} />
+            <UserInitials name={profile.display_name ?? profile.email} tier={profile.tier} />
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-medium text-phoro-primary">
                 {profile.display_name ?? profile.email}
@@ -133,7 +141,7 @@ export function RightPanel({
                 key={cat.value}
                 href={`/marketplace/${cat.value}`}
                 onClick={onClose}
-                className={`block w-full rounded-lg px-3 py-2 text-center text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-200 ${
+                className={`block w-full rounded-lg px-3 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-200 ${
                   isActive
                     ? "bg-phoro-primary text-white"
                     : "text-phoro-text/60 hover:bg-phoro-primary/10 hover:text-phoro-primary"

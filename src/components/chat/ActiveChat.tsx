@@ -5,6 +5,7 @@ import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
 import { ChatMessage } from "./ChatMessage";
 import { ChatInput } from "./ChatInput";
+import { useStreamingStore } from "@/stores/streamingStore";
 import type { ChatMessage as ChatMessageType } from "@/types/database";
 
 interface ActiveChatProps {
@@ -42,6 +43,13 @@ export function ActiveChat({
   });
 
   const isLoading = status === "streaming" || status === "submitted";
+
+  // Sync streaming state for favicon animation
+  const setStreaming = useStreamingStore((s) => s.setStreaming);
+  useEffect(() => {
+    setStreaming(status === "streaming");
+    return () => setStreaming(false);
+  }, [status, setStreaming]);
 
   // Scroll to bottom on new messages
   useEffect(() => {
@@ -81,6 +89,19 @@ export function ActiveChat({
               }
             />
           ))}
+
+          {/* Streaming indicator (waiting for first token) */}
+          {status === "submitted" && (
+            <div className="flex justify-start">
+              <div className="rounded-2xl bg-white px-4 py-3 shadow-sm">
+                <div className="flex gap-1">
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-phoro-text/30" style={{ animationDelay: "0ms" }} />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-phoro-text/30" style={{ animationDelay: "150ms" }} />
+                  <span className="h-2 w-2 animate-bounce rounded-full bg-phoro-text/30" style={{ animationDelay: "300ms" }} />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

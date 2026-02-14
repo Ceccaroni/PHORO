@@ -29,6 +29,8 @@ export function AssistentCard({
     <button
       onClick={handleClick}
       disabled={locked || loading}
+      aria-label={`${assistant.name}${locked ? ` – ab PHORO ${tierLabel(assistant.min_tier)} verfügbar` : ""}`}
+      aria-disabled={locked || undefined}
       className={`relative w-full rounded-2xl border border-phoro-divider bg-white p-5 text-left transition-all duration-200 ${
         locked
           ? "cursor-not-allowed opacity-45 grayscale"
