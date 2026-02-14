@@ -892,6 +892,13 @@ Vollständige Registrierung, Login, Tier-Verwaltung und Stripe-Integration.
    - **Perspektivisch:** Twint (sobald Stripe Twint unterstützt ODER via separaten Twint-Payment-Provider). Für den MVP ist es OK, Twint noch nicht zu haben.
    - **Beacon/Pharos:** Rechnung (manueller Prozess). Der Gründer stellt Rechnungen. Im Admin-Backend kann er Tiers manuell setzen. Schulen und Gemeinden zahlen in der Schweiz fast immer per Rechnung – das ist erwartbar und kein Problem.
 
+7. **E-Mail-Branding**
+   - Bestätigungs-E-Mails (Registration, Passwort-Reset) müssen mit PHORO-Branding gesendet werden – eigener Absender (z.B. `noreply@phoro.ch`), eigenes HTML-Template, kein Supabase-Default
+   - Supabase Dashboard → Authentication → Email Templates anpassen
+   - Custom SMTP konfigurieren (eigene Domain)
+   - Design passend zum PHORO Design-System (Warm-Beige, Pharos-Blau, Logo)
+   - Deutscher Text, professionell, passend zur Zielgruppe (Lehrpersonen, Schulleitungen)
+
 ### Definition of Done – Phase 4
 - [x] Registrierung mit E-Mail-Bestätigung funktioniert
 - [x] Login mit Passwort funktioniert
@@ -900,6 +907,7 @@ Vollständige Registrierung, Login, Tier-Verwaltung und Stripe-Integration.
 - [x] Stripe Checkout für Light-Tier funktioniert (Test-Mode)
 - [x] Webhook aktualisiert Tier in DB
 - [x] Tier-Wechsel wirkt sich sofort auf Assistenten-Zugang aus
+- [x] E-Mail-Templates gebrandet (PHORO-Absender, Logo, Design, deutscher Text)
 - [x] Git Commit: `feat: Phase 4 complete – Auth, Tiers & Payments`
 
 ---

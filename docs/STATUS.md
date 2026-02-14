@@ -51,6 +51,9 @@
 ## Bekannte Issues
 - Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
 
+## Offene Aufgaben
+- [ ] **E-Mail-Branding (Phase 4):** Bestätigungs-E-Mails (Registration, Passwort-Reset) mit PHORO-Branding senden – eigener Absender, eigenes Template, Logo, deutscher Text. Kein Supabase-Default.
+
 ## Geänderte Dateien in Session 2
 - `src/lib/llm/router.ts` (neu – LLM-Router mit Safety Block)
 - `src/lib/llm/types.ts` (neu)
