@@ -1,7 +1,11 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { LogOut, Settings } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
+import { ProfileDrawer } from "@/components/profile/ProfileDrawer";
 import type { Profile, Assistant, Category } from "@/types/database";
 import { TierBadge } from "@/components/shared/TierBadge";
 
@@ -40,6 +44,15 @@ export function RightPanel({
   onClose,
 }: RightPanelProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  async function handleLogout() {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/login");
+    router.refresh();
+  }
 
   return (
     <>
@@ -65,6 +78,22 @@ export function RightPanel({
                 {profile.display_name ?? profile.email}
               </p>
               <TierBadge tier={profile.tier} />
+            </div>
+            <div className="flex flex-col gap-1">
+              <button
+                onClick={() => setProfileOpen(true)}
+                className="rounded-lg p-1.5 text-phoro-text/40 transition-colors hover:bg-phoro-bg hover:text-phoro-primary"
+                aria-label="Einstellungen"
+              >
+                <Settings size={16} />
+              </button>
+              <button
+                onClick={handleLogout}
+                className="rounded-lg p-1.5 text-phoro-text/40 transition-colors hover:bg-phoro-bg hover:text-phoro-error"
+                aria-label="Abmelden"
+              >
+                <LogOut size={16} />
+              </button>
             </div>
           </div>
         </div>
@@ -116,6 +145,14 @@ export function RightPanel({
           })}
         </div>
       </aside>
+
+      {/* Profile Drawer */}
+      <ProfileDrawer
+        profile={profile}
+        open={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        onProfileUpdate={() => router.refresh()}
+      />
     </>
   );
 }

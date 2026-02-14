@@ -2,7 +2,7 @@
 
 ## Letzte Session
 - **Datum:** 2026-02-14
-- **Phase:** 3 (Assistenten-Engine) – VOLLSTÄNDIG ABGESCHLOSSEN, E2E-Test bestanden
+- **Phase:** 4 (Auth, Profil & Sicherheit) – CODE FERTIG, Migration 005 ausstehend
 - **Bearbeiter:** Claude Opus 4.6
 
 ## Was wurde erledigt
@@ -40,24 +40,49 @@
 - Chat-Streaming: FUNKTIONIERT (Nachrichten senden, Streaming-Antwort empfangen, Markdown-Rendering)
 - Chat-Historie: FUNKTIONIERT (Chats in linker Sidebar, Wechsel zwischen Chats)
 
+### Phase 4 (Auth, Profil & Sicherheit) – CODE FERTIG
+- **Registrierung erweitert:** Optionale Felder Organisation + Rolle, werden in `raw_user_meta_data` gespeichert
+- **Passwort-Reset-Flow:** `/forgot-password` (E-Mail senden) + `/reset-password` (neues Passwort setzen via Auth-Callback)
+- **Logout:** Icon-Button in RightPanel, `signOut()` → Redirect auf `/login`
+- **Profil-API:** `PATCH /api/profile` (Name, Org, Rolle) + `POST /api/profile/password` (Passwort ändern)
+- **ProfileDrawer:** Slide-in Drawer mit 3 Tabs: Profil (bearbeiten), Passwort (ändern), Sicherheit (2FA)
+- **2FA (TOTP):** Aktivieren (QR-Code + Verifizierung), Deaktivieren, Login mit TOTP-Code als zweiter Schritt
+- **Login mit MFA:** Prüft `aal1` → `aal2`, zeigt TOTP-Code-Eingabe
+- **E-Mail-Templates:** 3 PHORO-gebrandete HTML-Templates (Bestätigung, Passwort-Reset, Magic Link) in `docs/EMAIL_TEMPLATES.md`
+- **Migration 005:** Trigger `handle_new_user()` Update für Org-Felder aus Signup-Metadata
+- Build erfolgreich (`npm run build` ohne Fehler)
+
 ## Nächster Schritt (PRÄZISE)
-**Phase 4 starten:** Auth, Tiers & Payments
-- Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
-- Stripe-Integration (Checkout, Webhooks, Abo-Verwaltung)
-- 2FA (TOTP via Supabase Auth)
-- Profil-Seite (Tier anzeigen, Abo verwalten)
-- Tier-Gating durchsetzen (Middleware + API)
-- E-Mail-Branding (eigener Absender, PHORO-Template)
+1. **Migration 005 ausführen:** SQL aus `supabase/migrations/005_update_handle_new_user.sql` im Supabase SQL Editor ausführen
+2. **E-Mail-Templates einfügen:** HTML aus `docs/EMAIL_TEMPLATES.md` in Supabase Dashboard → Authentication → Email Templates
+3. **E2E-Test Phase 4:** Registrierung mit Org-Feldern, Passwort-Reset, Profil-Drawer, Logout, 2FA
+4. **Phase 5 starten:** Admin-Backend (Gründer-Panel für Assistenten-Verwaltung)
+5. **Stripe-Integration (separate Session):** Checkout, Webhooks, Abo-Verwaltung, Tier-Gating
 
 ## Bekannte Issues
 - Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
-- E-Mail-Branding: Kommt als generische "Supabase Auth" Mail → Phase 4
 
 ## Offene Aufgaben
-- [ ] **E-Mail-Branding (Phase 4):** Bestätigungs-E-Mails mit PHORO-Branding – eigener Absender, eigenes Template, Logo, deutscher Text
+- [ ] **Migration 005 ausführen:** `supabase/migrations/005_update_handle_new_user.sql` im SQL Editor ausführen
+- [ ] **E-Mail-Templates in Supabase einfügen:** 3 Templates aus `docs/EMAIL_TEMPLATES.md`
+- [ ] **Custom SMTP konfigurieren:** Eigener Absender (noreply@phoro.ch) statt Supabase default
 - [ ] **Alten Chat aufräumen:** Erster Chat (`ce5dc3fc...`) hat leere Messages wegen AI SDK v6 Bug (vor Fix) – kann manuell gelöscht werden
+- [ ] **Stripe-Integration (Phase 4b):** Checkout, Webhooks, Abo-Verwaltung, Tier-Gating
 
 ## Geänderte Dateien
+
+### Session 5 – 2026-02-14 (Phase 4: Auth, Profil & Sicherheit)
+- `supabase/migrations/005_update_handle_new_user.sql` (neu – Trigger für Org-Felder aus Signup-Metadata)
+- `src/app/(auth)/register/page.tsx` (optionale Felder Organisation + Rolle)
+- `src/app/(auth)/forgot-password/page.tsx` (neu – Passwort-Reset E-Mail senden)
+- `src/app/(auth)/reset-password/page.tsx` (neu – Neues Passwort setzen)
+- `src/app/(auth)/login/page.tsx` (MFA-Support: TOTP-Code als zweiter Schritt, "Passwort vergessen?"-Link)
+- `src/lib/supabase/middleware.ts` (neue Routes: `/forgot-password`, `/reset-password`)
+- `src/app/api/profile/route.ts` (neu – PATCH: Profil-Felder updaten)
+- `src/app/api/profile/password/route.ts` (neu – POST: Passwort ändern)
+- `src/components/profile/ProfileDrawer.tsx` (neu – Slide-in Drawer mit 3 Tabs: Profil, Passwort, 2FA)
+- `src/components/layout/RightPanel.tsx` (Logout + Settings-Buttons, ProfileDrawer eingebunden)
+- `docs/EMAIL_TEMPLATES.md` (neu – 3 PHORO-gebrandete HTML-Templates)
 
 ### Session 4 – 2026-02-14 (E2E-Test + Bugfixes)
 - `src/lib/supabase/middleware.ts` (Root-Redirect: `/` → `/login` oder `/chat`)

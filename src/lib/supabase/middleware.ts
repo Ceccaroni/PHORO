@@ -54,13 +54,22 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Auth pages: redirect to app if already authenticated
-  const isAuthRoute =
-    pathname.startsWith("/login") || pathname.startsWith("/register");
+  // Auth pages (public): redirect to app if already authenticated
+  const isPublicAuthRoute =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/register") ||
+    pathname.startsWith("/forgot-password");
 
-  if (isAuthRoute && user) {
+  if (isPublicAuthRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/chat";
+    return NextResponse.redirect(url);
+  }
+
+  // Reset password: requires authentication (user arrives via auth callback)
+  if (pathname.startsWith("/reset-password") && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 

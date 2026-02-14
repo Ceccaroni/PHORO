@@ -6,9 +6,9 @@
 Schweizer SaaS-Plattform für pädagogische KI-Assistenten. Dreispaltige Web-App (Sidebar links: Chat-Historie | Mitte: Chat/Marketplace | Sidebar rechts: User + Kategorien). Spezialisierte Workflow-Assistenten für Lehrpersonen, Heilpädagog:innen und Schulleitungen in der Deutschschweiz.
 
 ## Aktueller Status
-- **Phase:** 3 FERTIG, Phase 4 als nächstes
-- **Zuletzt abgeschlossen:** Phase 3 – E2E-Test bestanden (Auth → Marketplace → Chat-Streaming)
-- **Nächster Schritt:** Phase 4 starten (Auth, Tiers & Payments) – siehe `docs/BRIEFING.md` Abschnitt 11
+- **Phase:** 4 CODE FERTIG (Auth, Profil & Sicherheit) – Migration 005 + E-Mail-Templates in Supabase einfügen, dann E2E-Test
+- **Zuletzt abgeschlossen:** Phase 4 – Passwort-Reset, ProfileDrawer, 2FA, Logout, E-Mail-Templates
+- **Nächster Schritt:** Migration 005 ausführen, E-Mail-Templates einfügen, E2E-Test Phase 4, dann Phase 5 (Admin-Backend)
 - **Bekannte Issues:** Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
 
 ## Tech Stack
@@ -40,7 +40,8 @@ Next.js 16 (App Router) · TypeScript (strict) · Tailwind CSS v4 · Supabase (A
 Phase 1 – Foundation          ← Setup, DB, Auth-Basis          [FERTIG]
 Phase 2 – Core App Shell      ← 3-Spalten-Layout, Navigation   [FERTIG]
 Phase 3 – Assistenten-Engine  ← LLM-Router, Chat, Streaming    [FERTIG ✓ E2E]
-Phase 4 – Auth, Tiers & Pay   ← Registrierung, Stripe          [NÄCHSTE]
+Phase 4 – Auth, Profil & 2FA  ← Passwort-Reset, Profil, 2FA    [CODE FERTIG]
+Phase 4b – Stripe             ← Checkout, Webhooks, Tiers       [AUSSTEHEND]
 Phase 5 – Admin-Backend       ← Gründer-Panel für Assistenten
 Phase 6 – Polish & Content    ← Blog, öffentliche Seiten
 Phase 7 – Marketing-Page      ← Landing Page (wenn App läuft)
