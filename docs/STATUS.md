@@ -2,7 +2,7 @@
 
 ## Letzte Session
 - **Datum:** 2026-02-14
-- **Phase:** 3 (Assistenten-Engine) – CODE FERTIG
+- **Phase:** 3 (Assistenten-Engine) – FERTIG inkl. Supabase-Setup
 - **Bearbeiter:** Claude Opus 4.6
 
 ## Was wurde erledigt
@@ -12,7 +12,7 @@
 ### Phase 2 (Core App Shell) – FERTIG
 - AppShell, Sidebars, Marketplace, AssistentCard, ChatInput, responsive Layout
 
-### Phase 3 (Assistenten-Engine) – CODE FERTIG
+### Phase 3 (Assistenten-Engine) – FERTIG
 - LLM-Router (`src/lib/llm/router.ts`): Provider-agnostisch via Vercel AI SDK v6, OpenAI + Anthropic
 - Prompt-Sicherheit: Automatischer `[SYSTEM SAFETY BLOCK]` um jeden Systemprompt (Anfang + Ende), dokumentiert in BRIEFING.md Abschnitt 17
 - Chat-API-Route (`/api/chat`): Auth, Tier-Check, Chat-Verlauf aus DB, UIMessageStream-Streaming, speichert User- und Assistenten-Nachrichten, Auto-Titel nach erstem Austausch
@@ -25,29 +25,31 @@
 - AI SDK v6 Kompatibilität: `@ai-sdk/react`, `sendMessage`, `DefaultChatTransport`, `toUIMessageStreamResponse`, `maxOutputTokens`
 - Build erfolgreich (`npm run build` ohne Fehler)
 
-## Nächster Schritt (PRÄZISE)
-**Supabase einrichten (manuell durch Gründer):**
-1. Supabase-Projekt erstellen auf supabase.com (EU-Region Frankfurt)
-2. `.env.local` anlegen mit den Keys aus dem Supabase-Dashboard:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
-   SUPABASE_SERVICE_ROLE_KEY=xxx
-   ```
-3. Im Supabase SQL Editor die Migrationen der Reihe nach ausführen:
-   - `supabase/migrations/001_profiles.sql`
-   - `supabase/migrations/002_assistants.sql`
-   - `supabase/migrations/003_chats.sql`
-4. Dann `supabase/seed.sql` ausführen (45 Assistenten)
-5. `npm run dev` starten, registrieren, einloggen, Marketplace öffnen, Chat mit Inklusions-Architekt testen
-6. Für Chat-Streaming: `OPENAI_API_KEY` in `.env.local` setzen
+### Supabase-Setup – FERTIG
+- Supabase-Projekt erstellt (Organisation: Phoro, EU-Region Frankfurt, Free Plan)
+- `.env.local` konfiguriert (Supabase URL, Anon Key, Service Role Key, OpenAI API Key)
+- Migrationen 001–003 erfolgreich im SQL Editor ausgeführt (profiles, assistants, chats + chat_messages)
+- Seed-Daten ausgeführt (45 Assistenten in DB)
+- Dev-Server läuft (`npm run dev` auf localhost:3000)
+- End-to-End-Test: läuft (Registrierung + Chat-Test durch Gründer)
 
-**Danach Phase 4:** Auth, Tiers & Payments (Stripe, 2FA, Profil-Seite)
-Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
+## Nächster Schritt (PRÄZISE)
+**End-to-End-Test abschliessen:**
+1. Registrieren auf http://localhost:3000/register
+2. Bestätigungs-E-Mail anklicken (kommt von Supabase)
+3. Einloggen → Marketplace öffnen
+4. Inklusions-Architekt anklicken → Chat starten → Nachricht senden
+5. Streaming-Antwort verifizieren
+
+**Danach Phase 4 starten:** Auth, Tiers & Payments
+- Stripe-Integration (Checkout, Webhooks, Abo-Verwaltung)
+- 2FA (TOTP via Supabase Auth)
+- Profil-Seite (Tier anzeigen, Abo verwalten)
+- Tier-Gating durchsetzen (Middleware + API)
+- Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
 
 ## Bekannte Issues
 - Next.js 16 Middleware-Deprecation-Warning (funktioniert noch)
-- Supabase noch nicht verbunden (`.env.local` muss eingerichtet werden)
 
 ## Geänderte Dateien in Session 2
 - `src/lib/llm/router.ts` (neu – LLM-Router mit Safety Block)
@@ -73,6 +75,9 @@ Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
 - `supabase/seed.sql` (neu – 45 Assistenten)
 - `package.json` (aktualisiert – @ai-sdk/react)
 
+### Session 3 – 2026-02-14
+- `.env.local` konfiguriert (Supabase + OpenAI)
+
 ---
 
 ## Session-Verlauf (chronologisch)
@@ -87,4 +92,11 @@ Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
 - Phase 3 (Assistenten-Engine) Code komplett: LLM-Router, Chat-API, Streaming, 45 Seed-Assistenten
 - Prompt-Sicherheit implementiert (automatischer Safety Block)
 - AI SDK v6 Breaking Changes behoben
-- Status: Phase 1–3 Code fertig → Supabase-Setup + End-to-End-Test ausstehend
+- Status: Phase 1–3 Code fertig → Supabase-Setup ausstehend
+
+### Session 3 – 2026-02-14
+- Supabase-Projekt erstellt (Phoro Org, EU Frankfurt, Free Plan)
+- Migrationen 001–003 + Seed erfolgreich ausgeführt
+- `.env.local` konfiguriert (Supabase Keys + OpenAI API Key)
+- Dev-Server gestartet, End-to-End-Test läuft
+- Status: Phase 1–3 komplett → End-to-End-Test + Phase 4
