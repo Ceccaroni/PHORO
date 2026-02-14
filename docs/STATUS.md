@@ -14,25 +14,26 @@
 
 ### Phase 3 (Assistenten-Engine) – IN ARBEIT
 **Fertig:**
-- LLM-Router (`src/lib/llm/router.ts`): Provider-agnostisch via Vercel AI SDK, OpenAI + Anthropic
+- LLM-Router (`src/lib/llm/router.ts`): Provider-agnostisch via Vercel AI SDK v6, OpenAI + Anthropic
+- Prompt-Sicherheit: Jeder Systemprompt wird automatisch mit `[SYSTEM SAFETY BLOCK]` umschlossen (Anfang + Ende) – verhindert Prompt-Leaking. Dokumentiert in BRIEFING.md Abschnitt 17.
 - LLM-Typen (`src/lib/llm/types.ts`): LLMConfig, ChatMessageInput
-- Chat-API-Route (`/api/chat`): Auth, Tier-Check, Chat-Verlauf aus DB, Streaming via SSE, speichert User- und Assistenten-Nachrichten, Auto-Titel nach erstem Austausch
+- Chat-API-Route (`/api/chat`): Auth, Tier-Check, Chat-Verlauf aus DB, UIMessageStream-Streaming, speichert User- und Assistenten-Nachrichten, Auto-Titel nach erstem Austausch
 - Chat-Erstellungs-API (`/api/chats`): Erstellt neuen Chat mit Tier-Prüfung
-- ActiveChat-Komponente: `useChat` Hook (Vercel AI SDK), Streaming-Anzeige, Scroll-to-bottom
+- ActiveChat-Komponente: `useChat` Hook (AI SDK v6 mit `DefaultChatTransport` + `sendMessage`), Streaming-Anzeige, Scroll-to-bottom
 - ChatMessage-Komponente: User rechts (Pharos-Blau), Assistent links (weiss), Markdown-Rendering
 - Chat-Seite `/chat/[chatId]`: Lädt Chat + Messages aus DB, rendert ActiveChat
 - AssistentCard/Grid: Erstellen jetzt echte Chats via API und navigieren zu `/chat/[chatId]`
+- AI SDK v6 Kompatibilität: `@ai-sdk/react`, `sendMessage`, `DefaultChatTransport`, `toUIMessageStreamResponse`, `maxOutputTokens`
+- Build erfolgreich (`npm run build` ohne Fehler)
 
 **Noch offen:**
 - Seed-SQL mit Test-Assistent (z.B. Inklusions-Architekt)
-- Build-Verifikation nach allen Änderungen
 - Supabase muss eingerichtet werden für End-to-End-Test
 
 ## Nächster Schritt (PRÄZISE)
 1. `supabase/seed.sql` erstellen mit mindestens einem Test-Assistenten
-2. `npm run build` verifizieren
-3. Supabase-Projekt erstellen (EU), `.env.local` setzen, Migrationen + Seed ausführen
-4. End-to-End testen: Registrieren → Login → Marketplace → Chat starten → Streaming
+2. Supabase-Projekt erstellen (EU), `.env.local` setzen, Migrationen + Seed ausführen
+3. End-to-End testen: Registrieren → Login → Marketplace → Chat starten → Streaming
 
 **Dann Phase 4:** Auth, Tiers & Payments
 Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
@@ -42,15 +43,17 @@ Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
 - Supabase noch nicht verbunden (`.env.local` muss eingerichtet werden)
 
 ## Geänderte Dateien in letzter Session
-- `src/lib/llm/router.ts` (neu)
+- `src/lib/llm/router.ts` (neu + aktualisiert – Safety Block, AI SDK v6 Fixes)
 - `src/lib/llm/types.ts` (neu)
-- `src/app/api/chat/route.ts` (neu)
+- `src/app/api/chat/route.ts` (neu + aktualisiert – UIMessageStreamResponse)
 - `src/app/api/chats/route.ts` (neu)
 - `src/app/(app)/chat/[chatId]/page.tsx` (neu)
-- `src/components/chat/ActiveChat.tsx` (neu)
+- `src/components/chat/ActiveChat.tsx` (neu + aktualisiert – AI SDK v6 API)
 - `src/components/chat/ChatMessage.tsx` (neu)
 - `src/components/marketplace/AssistentCard.tsx` (aktualisiert – loading state)
 - `src/components/marketplace/AssistentGrid.tsx` (aktualisiert – echte Chat-Erstellung)
+- `docs/BRIEFING.md` (aktualisiert – Prompt-Sicherheitsregel Abschnitt 17)
+- `package.json` (aktualisiert – @ai-sdk/react hinzugefügt)
 
 ---
 
@@ -64,4 +67,6 @@ Details: `docs/BRIEFING.md` Abschnitt 11 (Phase 4)
 - Phase 1 (Foundation) komplett umgesetzt
 - Phase 2 (Core App Shell) komplett umgesetzt
 - Phase 3 (Assistenten-Engine) begonnen: LLM-Router, Chat-API, Streaming, ChatMessage
-- Status: Phase 3 in Arbeit → Seed-Daten + Build-Check ausstehend
+- Prompt-Sicherheit implementiert (automatischer Safety Block um jeden Systemprompt)
+- AI SDK v6 Breaking Changes behoben
+- Status: Phase 3 in Arbeit → Seed-Daten + Supabase-Setup ausstehend
