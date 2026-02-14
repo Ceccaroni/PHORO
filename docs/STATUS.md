@@ -68,6 +68,8 @@
 - [ ] **Custom SMTP konfigurieren:** Eigener Absender (noreply@phoro.ch) statt Supabase default
 - [ ] **Alten Chat aufräumen:** Erster Chat (`ce5dc3fc...`) hat leere Messages wegen AI SDK v6 Bug (vor Fix) – kann manuell gelöscht werden
 - [ ] **Stripe-Integration (Phase 4b):** Checkout, Webhooks, Abo-Verwaltung, Tier-Gating
+- [ ] **Tier-abhängiges Branding (Phase 6):** Initialen-Kachel, Tier-Badge, "Neuer Chat"-Button und Favicon passen sich farblich dem User-Tier an (Dawn=#E07A5F, Light=#1A3550, Beacon=#6B9080, Pharos=#C9A227)
+- [ ] **Animiertes Favicon beim Streaming (Phase 6):** Sun-O-Symbol pulsiert/animiert im Browser-Tab während LLM-Streaming als "Denk-Indikator"
 
 ## Geänderte Dateien
 

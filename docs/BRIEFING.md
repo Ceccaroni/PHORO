@@ -1090,12 +1090,36 @@ Der Gründer kann über ein Web-Interface Assistenten erstellen, bearbeiten und 
    - Fokus-Ringe sichtbar
    - Farb-Kontrast überprüfen (Warmbeige-Hintergrund beachten!)
 
+6. **Tier-abhängiges Branding**
+   Folgende UI-Elemente passen sich farblich dem Tier des Users an:
+   - **Initialen-Kachel** (UserInitials in RightPanel): Hintergrund + Textfarbe
+   - **Tier-Badge** (TierBadge-Komponente): bereits tier-farbig, ggf. vereinheitlichen
+   - **"Neuer Chat"-Button** (Sidebar): Hintergrund-/Akzentfarbe
+   - **Favicon** (Browser-Tab): Sun-O-Symbol in Tier-Farbe
+
+   | Tier | Farbe | Hex |
+   |------|-------|-----|
+   | Dawn | Morgenrot | `#E07A5F` |
+   | Light | Pharos-Blau | `#1A3550` |
+   | Beacon | Horizont-Grün | `#6B9080` |
+   | Pharos | Gold | `#C9A227` |
+
+   **Umsetzung:** Tier aus `profile.tier` lesen, Farbe über eine Utility-Funktion (`tierColor(tier)`) auflösen, als `style={{ color, backgroundColor }}` oder CSS-Variable anwenden. Favicon dynamisch per `<link rel="icon">` im `<head>` setzen (z.B. via SVG mit dynamischer Fill-Farbe oder 4 vorgerenderte PNGs).
+
+7. **Animiertes Favicon während LLM-Streaming**
+   Während der Assistent eine Antwort generiert (Streaming aktiv), pulsiert/animiert das Favicon im Browser-Tab als visueller "Denk-Indikator":
+   - **Idle:** Statisches Sun-O-Symbol in Tier-Farbe
+   - **Streaming:** Animiertes Sun-O (z.B. rotierende Strahlen, Pulsieren, oder Frame-basierte Animation)
+   - **Umsetzung:** Favicon per JavaScript wechseln (`document.querySelector('link[rel="icon"]').href = ...`). Entweder animiertes GIF/APNG oder Timer-basierter Frame-Wechsel zwischen mehreren SVG/PNG-Varianten. Animation stoppt wenn Stream beendet.
+
 ### Definition of Done – Phase 6
 - [x] Alle öffentlichen Seiten gebaut und inhaltlich gefüllt
 - [x] Blog funktioniert end-to-end
 - [x] SEO-Basics implementiert
 - [x] Loading States überall
 - [x] Mobile funktioniert
+- [x] Tier-abhängiges Branding (Initialen, Badge, Neuer-Chat-Button, Favicon)
+- [x] Animiertes Favicon während Streaming
 - [x] Git Commit: `feat: Phase 6 complete – Polish & Content`
 
 ---
